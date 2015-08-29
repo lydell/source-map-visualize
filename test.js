@@ -13,7 +13,7 @@ var cli = require('./cli')
 var run = testCli.bind(null, cli)
 
 function testUrl (t, url) {
-  t.regexTest(/^https?:\/\/[^/]+\/[^#]+#.{100,}?/, url)
+  t.regexTest(/^https?:\/\/[^/]+\/[^#]+#.{100,}\n?$/, url)
 }
 
 function success (t, fn) {
