@@ -1,0 +1,7 @@
+)]}'{
+  "mappings": "AAAA",
+  "sourceRoot": "",
+  "sources": ["source1.js", "../.gitignore", "http://example.com/virtual.js", "./sub/source1.js"],
+  "sourcesContent": [null, null, "// virtual"],
+  "names": []
+}

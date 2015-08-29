@@ -1,0 +1,5 @@
+{
+  "mappings": "AAAA",
+  "sources": ["source1.js", "source2.js"],
+  "names": []
+}

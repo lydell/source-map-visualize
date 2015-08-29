@@ -1,0 +1,2 @@
+// generated
+//# sourceMappingURL=regular.map

@@ -1,0 +1,17 @@
+USAGE:
+
+  source-map-visualize GENERATED_FILE [OPTIONS]
+  source-map-visualize GENERATED_FILE SOURCE_MAP [OPTIONS]
+
+  Opens an online visualizer for the source map of GENERATED_FILE. The source
+  map is automatically found by looking for a sourceMappingURL comment in
+  GENERATED_FILE. Alternatively, it can be provided as the second argument. The
+  source files referenced in the source map are automatically resolved.
+
+OPTIONS:
+
+  -r, --source-root           Override the "sourceRoot" key of the source map.
+  --no-r, --no-source-root    Ignore the "sourceRoot" key of the source map.
+  -p, --print                 Print the URL instead of opening it.
+  -h, --help                  Print this message and exit.
+  -v, --version               Print the version number and exit.

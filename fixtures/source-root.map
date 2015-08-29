@@ -1,0 +1,6 @@
+{
+  "mappings": "AAAA",
+  "sourceRoot": "sub/",
+  "sources": ["source1.js"],
+  "names": []
+}

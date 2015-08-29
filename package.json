@@ -1,0 +1,46 @@
+{
+  "name": "source-map-visualize",
+  "version": "1.0.0",
+  "author": "Simon Lydell",
+  "license": "MIT",
+  "description": "Quickly open an online source map visualization with local files",
+  "bin": "source-map-visualize",
+  "preferGlobal": true,
+  "repository": "lydell/source-map-visualize",
+  "keywords": [
+    "source map",
+    "sourcemap",
+    "source",
+    "map",
+    "sourceMappingURL",
+    "resolve",
+    "resolver",
+    "locate",
+    "locator",
+    "find",
+    "finder",
+    "cli",
+    "command line",
+    "commandline",
+    "visual",
+    "visualize",
+    "visualization",
+    "sokra",
+    "inpect"
+  ],
+  "scripts": {
+    "lint": "standard '*.js'",
+    "unit": "ava",
+    "test": "npm run lint && npm run unit"
+  },
+  "dependencies": {
+    "minimist": "^1.2.0",
+    "opn": "^3.0.2",
+    "source-map-resolve": "^0.4.0"
+  },
+  "devDependencies": {
+    "ava": "^0.1.0",
+    "standard": "^5.1.1",
+    "test-cli": "^0.1.0"
+  }
+}
