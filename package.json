@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "ava": "^0.1.0",
-    "standard": "^5.1.1",
+    "standard": "^6.0.7",
     "test-cli": "^0.1.0"
   }
 }
