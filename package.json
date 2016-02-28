@@ -1,6 +1,6 @@
 {
   "name": "source-map-visualize",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "Simon Lydell",
   "license": "MIT",
   "description": "Quickly open an online source map visualization with local files",
