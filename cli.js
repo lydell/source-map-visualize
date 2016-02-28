@@ -4,6 +4,7 @@
 var fs = require('fs')
 var path = require('path')
 var minimist = require('minimist')
+var sourceMap = require('source-map')
 var lib = require('./')
 
 var minimistOptions = {
@@ -56,24 +57,64 @@ module.exports = function cli (process, done) {
     sourceRoot: argv['source-root']
   }
   lib.resolve(options, function (error, result) {
+    var report
+
     if (error) {
       var message = error.message
       if (error instanceof SyntaxError) {
         message = 'Invalid JSON in source map: ' + message
       }
-      write(process.stderr, message, done)
+      if (error.sourceMapData) {
+        report = createErrorReport(
+          message, error.sourceMapData,
+          'Source map content: ' + lib.displaySourceMap(error.sourceMapData.map)
+        )
+      } else {
+        report = message
+      }
+      write(process.stderr, report)
       return done(1)
     }
+
+    try {
+      new sourceMap.SourceMapConsumer(result.map) // eslint-disable-line no-new
+    } catch (error) {
+      report = createErrorReport(
+        error.message, result,
+        'Source map content: ' + lib.displaySourceMap(result.map)
+      )
+      write(process.stderr, report, done)
+      return done(1)
+    }
+
+    result.sourcesContent = result.sourcesContent.map(function (item, index) {
+      return typeof item === 'string' ? item : createErrorReport(
+        item.message, result, 'Source: ' + result.map.sources[index]
+      )
+    })
+
     var url = lib.createUrl(result)
     if (argv['print']) {
       write(process.stdout, url)
     } else {
       lib.open(url)
     }
+
     done(0)
   })
 }
 
 function write (stream, message) {
   stream.write(message + '\n')
+}
+
+function createErrorReport (message, data, extra) {
+  return [
+    message,
+    '',
+    'sourceMappingURL: ' + data.sourceMappingURL,
+    'Source map URL: ' + data.url,
+    'Sources fetched relative to: ' + data.sourcesRelativeTo,
+    extra
+  ].join('\n')
 }

@@ -97,7 +97,7 @@ test('non-existent map', function (t) {
   run(
     'fixtures/no-comment.js', 'non-existent.map',
     failure(t, function (stderr) {
-      t.regexTest(/no such file.+non-existent\.map.*\n$/, stderr)
+      t.regexTest(/no such file.+non-existent\.map.*\n\n.+/, stderr)
     })
   )
 })
@@ -105,17 +105,15 @@ test('non-existent map', function (t) {
 test('directory as map target', function (t) {
   t.plan(3)
   run('fixtures/no-comment.js', 'fixtures', failure(t, function (stderr) {
-    t.regexTest(/directory.*\n$/, stderr)
+    t.regexTest(/directory.*\n\n.+/, stderr)
   }))
 })
 
 test('non-existent source', function (t) {
   t.plan(3)
   run(
-    'fixtures/no-comment.js', 'fixtures/non-existent-source.map',
-    failure(t, function (stderr) {
-      t.regexTest(/no such file.+fixtures\/non-existent\.js.*\n$/, stderr)
-    })
+    'fixtures/no-comment.js', 'fixtures/non-existent-source.map', '-p',
+    okUrlOutput(t)
   )
 })
 
@@ -127,11 +125,13 @@ test('missing sourceMappingURL comment', function (t) {
 })
 
 test('invalid json', function (t) {
-  t.plan(3)
+  t.plan(4)
   run(
     'fixtures/no-comment.js', 'fixtures/invalid-json.map',
     failure(t, function (stderr) {
-      t.regexTest(/^Invalid JSON in source map: .+\n$/, stderr)
+      t.regexTest(/^Invalid JSON in source map: .+\n\n.+/, stderr)
+      var jsonText = fs.readFileSync('fixtures/invalid-json.map').toString()
+      t.is(stderr.slice(-jsonText.length - 1), jsonText + '\n')
     })
   )
 })
@@ -161,6 +161,51 @@ test('data uri', function (t) {
       testUrl(t, stdout)
       run('fixtures/data-uri.js', 'fixtures/data-uri-ed.map', '-p',
           identicalOutput)
+    })
+  )
+})
+
+test('invalid source map as data uri', function (t) {
+  t.plan(3)
+  run(
+    'fixtures/invalid-data-uri.js',
+    failure(t, function (stderr) {
+      t.is(stderr, [
+        '"version" is a required argument.',
+        '',
+        'sourceMappingURL: data:application/json;base64,eyJtYXBwaW5ncyI6IkFBQUEiLCJzb3VyY2VzIjpbImZvby5qcyJdLCJuYW1lcyI6W119',
+        'Source map URL: null',
+        'Sources fetched relative to: fixtures/invalid-data-uri.js',
+        'Source map content: {',
+        '  "mappings": "AAAA",',
+        '  "sources": [',
+        '    "foo.js"',
+        '  ],',
+        '  "names": []',
+        '}'
+      ].join('\n') + '\n')
+    })
+  )
+})
+
+test('invalid source map as data uri', function (t) {
+  t.plan(3)
+  run(
+    'fixtures/no-comment.js', 'fixtures/missing-mappings.map',
+    failure(t, function (stderr) {
+      t.is(stderr, [
+        '"mappings" is a required argument.',
+        '',
+        'sourceMappingURL: null',
+        'Source map URL: fixtures/missing-mappings.map',
+        'Sources fetched relative to: fixtures/missing-mappings.map',
+        'Source map content: {',
+        '  "version": 3,',
+        '  "sources": [',
+        '    "source1.js"',
+        '  ]',
+        '}'
+      ].join('\n') + '\n')
     })
   )
 })
@@ -209,7 +254,8 @@ test('complex – lib', function (t) {
         '/*# sourceMappingURL=../../fixtures/./complex.map */',
         ''
       ].join('\n'))
-      t.same(result.sourceMap, {
+      t.same(result.map, {
+        version: 3,
         mappings: 'AAAA',
         sourceRoot: '',
         sources: ['source1.js', '../.gitignore',
@@ -225,4 +271,31 @@ test('complex – lib', function (t) {
       t.is(s[3], '// source1-sub\n')
     }
   )
+})
+
+test('displaySourceMap – lib', function (t) {
+  t.plan(1)
+  t.is(lib.displaySourceMap({
+    version: 3,
+    mappings: ';AAAA;AAAA,MAAA,8BAAA;IAAA;;;EAAM;IACS,gBAAC,IAAD;MAAC,IAAC,CAAA,OAAD;MACZ,IAAC',
+    sources: ['source1.js', '../.gitignore',
+              'http://example.com/virtual.js', './sub/source1.js'],
+    sourcesContent: [null, null, 'function add(first, second) \n {  return first + second;\n}\n// comment at the end']
+  }), [
+    '{',
+    '  "version": 3,',
+    '  "mappings": ";AAAA;AAAA,MAAA,8BAAA;IAAA;;;EAAM;IACS,gBAAC,IAAD;MAAC,IAAC,CAAA,OA...",',
+    '  "sources": [',
+    '    "source1.js",',
+    '    "../.gitignore",',
+    '    "http://example.com/virtual.js",',
+    '    "./sub/source1.js"',
+    '  ],',
+    '  "sourcesContent": [',
+    '    null,',
+    '    null,',
+    '    "function add(first, second) \\n {  return first + second;\\n}\\n// commen..."',
+    '  ]',
+    '}'
+  ].join('\n'))
 })

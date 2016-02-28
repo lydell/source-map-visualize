@@ -1,5 +1,6 @@
 {
+  "version": 3,
   "mappings": "AAAA",
-  "sources": ["source1.js", "non-existent.js"],
+  "sources": ["non-existent.js", "source1.js"],
   "names": []
 }
